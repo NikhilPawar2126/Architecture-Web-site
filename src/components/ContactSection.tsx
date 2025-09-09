@@ -56,7 +56,7 @@ const ContactSection = () => {
               <h3 className="text-2xl font-display font-semibold text-primary mb-6">
                 Get In Touch
               </h3>
-              <p className="text-muted-foreground leading-relaxed mb-8">
+              <p className="text-lg text-muted-foreground leading-relaxed mb-8">
                 I'm currently accepting new projects and would be delighted to 
                 discuss your design needs. Whether it's a complete home renovation 
                 or a commercial space redesign, let's create something extraordinary together.
@@ -111,9 +111,9 @@ const ContactSection = () => {
                   <Clock className="h-6 w-6 text-accent" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-primary mb-1">Response Time</h4>
+                  <h4 className="font-semibold text-primary mb-1">Working Hours</h4>
                   <p className="text-muted-foreground">
-                    Within 24 hours
+                    9 AM to 5 PM
                   </p>
                 </div>
               </div>

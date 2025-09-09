@@ -66,20 +66,24 @@ const HeroSection = () => {
 
           {/* Call to Action */}
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button 
-              size="lg" 
-              className="btn-accent text-lg px-8 py-6 group"
-            >
-              View My Work
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="text-lg px-8 py-6 border-white/30 text-white hover:bg-white/10 transition-smooth"
-            >
-              Get In Touch
-            </Button>
+            <a href="#projects">
+              <Button 
+                size="lg" 
+                className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg hover:shadow-xl transition-smooth text-lg px-8 py-6 group w-full sm:w-auto"
+              >
+                View My Work
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </a>
+            <a href="#contact">
+              <Button 
+                variant="hero" 
+                size="lg"
+                className="text-lg px-8 py-6 hover:shadow-lg w-full sm:w-auto"
+              >
+                Get In Touch
+              </Button>
+            </a>
           </div>
         </div>
       </div>
