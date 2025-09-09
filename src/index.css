@@ -9,36 +9,36 @@
   :root {
     /* Core Brand Colors - Architectural Palette */
     --background: 0 0% 99%;
-    --foreground: 210 15% 12%;
+    --foreground: 210 20% 8%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 15% 12%;
+    --card-foreground: 210 20% 8%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 15% 12%;
+    --popover-foreground: 210 20% 8%;
 
-    /* Primary - Deep Charcoal */
-    --primary: 210 15% 12%;
+    /* Primary - Architectural Charcoal */
+    --primary: 210 20% 8%;
     --primary-foreground: 0 0% 98%;
 
-    /* Secondary - Warm Stone */
-    --secondary: 30 8% 92%;
-    --secondary-foreground: 210 15% 12%;
+    /* Secondary - Warm Concrete */
+    --secondary: 30 12% 90%;
+    --secondary-foreground: 210 20% 8%;
 
-    /* Accent - Sophisticated Bronze */
-    --accent: 35 45% 65%;
-    --accent-foreground: 210 15% 12%;
+    /* Accent - Architectural Gold */
+    --accent: 38 70% 55%;
+    --accent-foreground: 210 20% 8%;
 
     /* Muted Tones */
-    --muted: 210 8% 96%;
-    --muted-foreground: 210 10% 45%;
+    --muted: 210 12% 94%;
+    --muted-foreground: 210 15% 40%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 210 12% 90%;
-    --input: 210 12% 90%;
-    --ring: 35 45% 65%;
+    --border: 210 15% 88%;
+    --input: 210 15% 88%;
+    --ring: 38 70% 55%;
 
     --radius: 0.75rem;
 

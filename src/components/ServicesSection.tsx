@@ -89,13 +89,6 @@ const ServicesSection = () => {
                 </ul>
               </div>
 
-              {/* CTA */}
-              <Button 
-                variant="outline" 
-                className="w-full group-hover:border-accent group-hover:text-accent transition-smooth"
-              >
-                Learn More
-              </Button>
             </div>
           ))}
         </div>

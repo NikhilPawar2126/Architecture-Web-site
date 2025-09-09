@@ -48,7 +48,7 @@ const Navigation = () => {
               <span className={`transition-colors ${
                 isScrolled ? 'text-primary' : 'text-white'
               }`}>
-                Interior23Design
+                Hiran Vaghela
               </span>
             </div>
 
