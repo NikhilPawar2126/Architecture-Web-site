@@ -97,9 +97,11 @@ const ServicesSection = () => {
           <p className="text-lg text-muted-foreground mb-8">
             Ready to start your project? Let's discuss your vision and bring it to life.
           </p>
-          <Button size="lg" className="btn-primary text-lg px-8 py-6">
-            Get Free Consultation
-          </Button>
+          <a href="#contact">
+            <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg hover:shadow-xl transition-smooth text-lg px-8 py-6">
+              Get Free Consultation
+            </Button>
+          </a>
         </div>
       </div>
     </section>

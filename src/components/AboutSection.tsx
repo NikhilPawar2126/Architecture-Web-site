@@ -1,4 +1,4 @@
-import { Building2, Home, Palette, Ruler } from "lucide-react";
+import { Building2, Home, Palette, Ruler, GraduationCap, MapPin } from "lucide-react";
 
 const AboutSection = () => {
   const expertise = [
@@ -54,11 +54,21 @@ const AboutSection = () => {
 
             <div className="grid grid-cols-2 gap-6">
               <div className="card-elegant p-6 rounded-xl bg-card">
-                <h4 className="font-semibold text-primary mb-2">Education</h4>
+                <div className="flex items-center space-x-3 mb-2">
+                  <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
+                    <GraduationCap className="h-4 w-4 text-accent" />
+                  </div>
+                  <h4 className="font-semibold text-primary">Education</h4>
+                </div>
                 <p className="text-muted-foreground">Architecture & Interior Design</p>
               </div>
               <div className="card-elegant p-6 rounded-xl bg-card">
-                <h4 className="font-semibold text-primary mb-2">Location</h4>
+                <div className="flex items-center space-x-3 mb-2">
+                  <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
+                    <MapPin className="h-4 w-4 text-accent" />
+                  </div>
+                  <h4 className="font-semibold text-primary">Location</h4>
+                </div>
                 <p className="text-muted-foreground">Gujarat, India</p>
               </div>
             </div>
