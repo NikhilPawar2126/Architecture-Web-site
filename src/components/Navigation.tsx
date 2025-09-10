@@ -48,7 +48,7 @@ const Navigation = () => {
               <img 
                 src="/lovable-uploads/0313ca79-8947-4b07-ac30-ee463e81fea0.png"
                 alt="Interior Designer Logo"
-                className="h-16 w-16 object-contain transition-all duration-300 hover:scale-105 drop-shadow-lg"
+                className="h-20 w-20 object-contain transition-all duration-300 hover:scale-105 drop-shadow-lg"
               />
             </div>
 
