@@ -39,6 +39,28 @@ const HeroSection = () => {
             </p>
           </div>
 
+          {/* Call to Action - moved up */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-10">
+            <a href="#projects">
+              <Button 
+                size="lg" 
+                className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg hover:shadow-xl transition-smooth text-lg px-8 py-6 group w-full sm:w-auto"
+              >
+                View My Work
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </a>
+            <a href="#contact">
+              <Button 
+                variant="hero" 
+                size="lg"
+                className="text-lg px-8 py-6 hover:shadow-lg w-full sm:w-auto"
+              >
+                Get In Touch
+              </Button>
+            </a>
+          </div>
+
           {/* Stats Row */}
           <div className="grid grid-cols-3 gap-8 mb-12 max-w-lg">
             <div className="text-center">
@@ -64,27 +86,6 @@ const HeroSection = () => {
             </div>
           </div>
 
-          {/* Call to Action */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <a href="#projects">
-              <Button 
-                size="lg" 
-                className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg hover:shadow-xl transition-smooth text-lg px-8 py-6 group w-full sm:w-auto"
-              >
-                View My Work
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </a>
-            <a href="#contact">
-              <Button 
-                variant="hero" 
-                size="lg"
-                className="text-lg px-8 py-6 hover:shadow-lg w-full sm:w-auto"
-              >
-                Get In Touch
-              </Button>
-            </a>
-          </div>
         </div>
       </div>
 
