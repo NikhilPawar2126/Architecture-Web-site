@@ -46,9 +46,9 @@ const Navigation = () => {
               onClick={() => scrollToSection('home')}
             >
               <img 
-                src="/lovable-uploads/5f680915-3923-484b-8fe1-7dd52b9525d4.png"
+                src="/lovable-uploads/0313ca79-8947-4b07-ac30-ee463e81fea0.png"
                 alt="Interior Designer Logo"
-                className="h-12 w-12 object-contain transition-opacity hover:opacity-90"
+                className="h-16 w-16 object-contain transition-all duration-300 hover:scale-105 drop-shadow-lg"
               />
             </div>
 
