@@ -42,14 +42,14 @@ const Navigation = () => {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <div 
-              className="font-display font-bold text-2xl cursor-pointer"
+              className="cursor-pointer"
               onClick={() => scrollToSection('home')}
             >
-              <span className={`transition-colors ${
-                isScrolled ? 'text-primary' : 'text-white'
-              }`}>
-                Hiran Vaghela
-              </span>
+              <img 
+                src="/lovable-uploads/5f680915-3923-484b-8fe1-7dd52b9525d4.png"
+                alt="Interior Designer Logo"
+                className="h-12 w-12 object-contain transition-opacity hover:opacity-90"
+              />
             </div>
 
             {/* Desktop Navigation */}
