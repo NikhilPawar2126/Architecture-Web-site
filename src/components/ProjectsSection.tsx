@@ -70,7 +70,11 @@ const ProjectsSection = () => {
                   </Button>
                 </div>
                 <div className="absolute top-4 left-4">
-                  <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    project.category === 'Residential' 
+                      ? 'bg-accent text-accent-foreground' 
+                      : 'bg-secondary text-secondary-foreground'
+                  }`}>
                     {project.category}
                   </span>
                 </div>
