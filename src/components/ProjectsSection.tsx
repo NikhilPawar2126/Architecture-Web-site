@@ -1,39 +1,48 @@
 import { ExternalLink, Calendar, MapPin, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useProjects } from "@/hooks/useProjects";
 
 const ProjectsSection = () => {
-  const projects = [
+  const { projects, isLoading, error } = useProjects();
+
+  // Fallback projects if database is empty or there's an error
+  const fallbackProjects = [
     {
-      id: 1,
+      id: "fallback-1",
       title: "Modern Villa Design", 
-      category: "Residential",
+      category: "Residential" as const,
       location: "Vadodara",
       year: "2024",
       description: "A contemporary 3-bedroom villa featuring clean lines, natural materials, and seamless indoor-outdoor living spaces.",
       image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      houzzLink: "https://www.houzz.in/pro/interior-23design/interior-23design"
+      houzz_link: "https://www.houzz.in/pro/interior-23design/interior-23design",
+      created_at: "2024-01-01"
     },
     {
-      id: 2,
+      id: "fallback-2",
       title: "Luxury Apartment Interior",
-      category: "Residential", 
+      category: "Residential" as const, 
       location: "Surat",
       year: "2024",
       description: "Elegant 2-bedroom apartment with modern minimalist design, premium finishes, and smart storage solutions.",
       image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      houzzLink: "https://www.houzz.in/pro/interior-23design/interior-23design"
+      houzz_link: "https://www.houzz.in/pro/interior-23design/interior-23design",
+      created_at: "2024-01-01"
     },
     {
-      id: 3,
+      id: "fallback-3",
       title: "Contemporary Office Space",
-      category: "Commercial",
+      category: "Commercial" as const,
       location: "Ahmedabad", 
       year: "2023",
       description: "Modern office design with open workspace, collaborative areas, and sustainable design elements for productivity.",
       image: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      houzzLink: "https://www.houzz.in/pro/interior-23design/interior-23design"
+      houzz_link: "https://www.houzz.in/pro/interior-23design/interior-23design",
+      created_at: "2024-01-01"
     }
   ];
+
+  const displayProjects = projects.length > 0 ? projects : fallbackProjects;
 
   return (
     <section id="projects" className="py-20 bg-muted/30">
@@ -48,9 +57,25 @@ const ProjectsSection = () => {
           </p>
         </div>
 
+        {/* Loading State */}
+        {isLoading && (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading projects...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="text-center py-12">
+            <p className="text-destructive mb-4">Error loading projects: {error}</p>
+            <p className="text-muted-foreground">Showing sample projects instead</p>
+          </div>
+        )}
+
         {/* Projects Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {projects.map((project) => (
+          {displayProjects.map((project) => (
             <div key={project.id} className="card-elegant rounded-2xl overflow-hidden bg-card group">
               <div className="relative">
                 <img 
@@ -63,7 +88,7 @@ const ProjectsSection = () => {
                     variant="secondary" 
                     size="sm"
                     className="opacity-0 group-hover:opacity-100 transition-smooth"
-                    onClick={() => window.open(project.houzzLink, '_blank')}
+                    onClick={() => window.open(project.houzz_link, '_blank')}
                   >
                     <ExternalLink className="mr-2 h-4 w-4" />
                     View
@@ -102,7 +127,7 @@ const ProjectsSection = () => {
                   variant="outline"
                   size="sm"
                   className="w-full"
-                  onClick={() => window.open(project.houzzLink, '_blank')}
+                  onClick={() => window.open(project.houzz_link, '_blank')}
                 >
                   <ExternalLink className="mr-2 h-3 w-3" />
                   View Details
