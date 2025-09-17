@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from "react";
 
 export interface Project {
   id: string;
   title: string;
-  category: 'Residential' | 'Commercial';
+  category: "Residential" | "Commercial";
   location: string;
   year: string;
   description: string;
@@ -22,18 +21,17 @@ export const useProjects = () => {
     try {
       setIsLoading(true);
       setError(null);
-      
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      
+      // 👇 Replace with your actual backend API endpoint
+      const res = await fetch("http://localhost:5000/projects");
+
+      if (!res.ok) throw new Error("Failed to fetch projects");
+
+      const data: Project[] = await res.json();
       setProjects(data || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch projects');
-      console.error('Error fetching projects:', err);
+      setError(err instanceof Error ? err.message : "Failed to fetch projects");
+      console.error("Error fetching projects:", err);
     } finally {
       setIsLoading(false);
     }
@@ -47,6 +45,6 @@ export const useProjects = () => {
     projects,
     isLoading,
     error,
-    refetch: fetchProjects
+    refetch: fetchProjects,
   };
 };

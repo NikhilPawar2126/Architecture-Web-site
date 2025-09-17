@@ -15,13 +15,34 @@ const ContactSection = () => {
     message: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Message Sent!",
-      description: "Thank you for your inquiry. I'll get back to you within 24 hours.",
-    });
-    setFormData({ name: '', email: '', phone: '', project: '', message: '' });
+
+    try {
+      const response = await fetch("http://localhost:5000/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Message Sent!",
+          description: "Check your inbox — the email has been sent successfully 🎉",
+        });
+        setFormData({ name: '', email: '', phone: '', project: '', message: '' });
+      } else {
+        toast({
+          title: "Error",
+          description: "Something went wrong. Please try again.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Could not connect to server.",
+      });
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -32,7 +53,7 @@ const ContactSection = () => {
   };
 
   const locations = [
-    "Vadodara", "Ahmedabad", "Gandhinagar", 
+    "Vadodara", "Ahmedabad", "Gandhinagar",
     "Junagadh", "Rajkot", "Surat"
   ];
 
@@ -44,7 +65,7 @@ const ContactSection = () => {
             Let's Build Something Beautiful Together
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Ready to transform your space? I'd love to hear about your project and 
+            Ready to transform your space? I'd love to hear about your project and
             discuss how we can bring your vision to life.
           </p>
         </div>
@@ -57,8 +78,8 @@ const ContactSection = () => {
                 Get In Touch
               </h3>
               <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                I'm currently accepting new projects and would be delighted to 
-                discuss your design needs. Whether it's a complete home renovation 
+                I'm currently accepting new projects and would be delighted to
+                discuss your design needs. Whether it's a complete home renovation
                 or a commercial space redesign, let's create something extraordinary together.
               </p>
             </div>
@@ -70,8 +91,8 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <h4 className="font-semibold text-primary mb-1">Email</h4>
-                  <a 
-                    href="mailto:interior23design@gmail.com" 
+                  <a
+                    href="mailto:interior23design@gmail.com"
                     className="text-muted-foreground hover:text-accent transition-smooth"
                   >
                     interior23design@gmail.com
@@ -85,8 +106,8 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <h4 className="font-semibold text-primary mb-1">Phone</h4>
-                  <a 
-                    href="tel:+918141698614" 
+                  <a
+                    href="tel:+918141698614"
                     className="text-muted-foreground hover:text-accent transition-smooth"
                   >
                     +91 8141698614
@@ -208,9 +229,9 @@ const ContactSection = () => {
                   />
                 </div>
 
-                <Button 
-                  type="submit" 
-                  size="lg" 
+                <Button
+                  type="submit"
+                  size="lg"
                   className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg hover:shadow-xl transition-smooth w-full md:w-auto"
                 >
                   <Send className="mr-2 h-5 w-5" />

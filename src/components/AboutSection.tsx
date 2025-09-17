@@ -69,7 +69,7 @@ const AboutSection = () => {
                   </div>
                   <h4 className="font-semibold text-primary">Location</h4>
                 </div>
-                <p className="text-muted-foreground">Gujarat, India</p>
+                <p className="text-muted-foreground">Vadodara - Gujarat, India</p>
               </div>
             </div>
           </div>

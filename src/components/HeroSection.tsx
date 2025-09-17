@@ -74,14 +74,14 @@ const HeroSection = () => {
               <div className="flex items-center justify-center w-12 h-12 bg-accent/20 rounded-lg mb-3 mx-auto">
                 <Users className="h-6 w-6 text-accent" />
               </div>
-              <div className="text-2xl font-bold text-white">50+</div>
+              <div className="text-2xl font-bold text-white">5+</div>
               <div className="text-sm text-white/70">Happy Clients</div>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center w-12 h-12 bg-accent/20 rounded-lg mb-3 mx-auto">
                 <Calendar className="h-6 w-6 text-accent" />
               </div>
-              <div className="text-2xl font-bold text-white">100+</div>
+              <div className="text-2xl font-bold text-white">7+</div>
               <div className="text-sm text-white/70">Projects Done</div>
             </div>
           </div>
