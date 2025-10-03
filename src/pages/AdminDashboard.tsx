@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Edit2, Trash2, X, ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 interface Project {
   id: string;
@@ -20,6 +19,8 @@ interface Project {
   images: string[];
   created_at: string;
 }
+
+const STORAGE_KEY = 'portfolio_projects';
 
 const AdminDashboard = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -41,27 +42,26 @@ const AdminDashboard = () => {
     fetchProjects();
   }, []);
 
-  const fetchProjects = async () => {
+  const fetchProjects = () => {
     try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setProjects(data || []);
+      const stored = localStorage.getItem(STORAGE_KEY);
+      const data = stored ? JSON.parse(stored) : [];
+      setProjects(data.sort((a: Project, b: Project) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      ));
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to fetch projects",
         variant: "destructive"
       });
+      setProjects([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
@@ -76,29 +76,29 @@ const AdminDashboard = () => {
         return;
       }
 
-      const dataToSave = {
-        ...formData,
-        images: filteredImages
-      };
+      const stored = localStorage.getItem(STORAGE_KEY);
+      const existingProjects = stored ? JSON.parse(stored) : [];
       
       if (editingProject) {
-        const { error } = await supabase
-          .from('projects')
-          .update(dataToSave)
-          .eq('id', editingProject.id);
-
-        if (error) throw error;
+        const updatedProjects = existingProjects.map((p: Project) =>
+          p.id === editingProject.id
+            ? { ...formData, images: filteredImages, id: editingProject.id, created_at: editingProject.created_at }
+            : p
+        );
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedProjects));
         
         toast({
           title: "Success",
           description: "Project updated successfully"
         });
       } else {
-        const { error } = await supabase
-          .from('projects')
-          .insert([dataToSave]);
-
-        if (error) throw error;
+        const newProject = {
+          ...formData,
+          images: filteredImages,
+          id: crypto.randomUUID(),
+          created_at: new Date().toISOString()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify([newProject, ...existingProjects]));
         
         toast({
           title: "Success", 
@@ -146,16 +146,14 @@ const AdminDashboard = () => {
     setFormData({ ...formData, images: newImages });
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (!confirm('Are you sure you want to delete this project?')) return;
     
     try {
-      const { error } = await supabase
-        .from('projects')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
+      const stored = localStorage.getItem(STORAGE_KEY);
+      const existingProjects = stored ? JSON.parse(stored) : [];
+      const updatedProjects = existingProjects.filter((p: Project) => p.id !== id);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedProjects));
       
       toast({
         title: "Success",

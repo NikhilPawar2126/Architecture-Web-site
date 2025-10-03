@@ -5,7 +5,7 @@ import ProjectGallery from "./ProjectGallery";
 import { useState } from "react";
 
 const ProjectsSection = () => {
-  const { projects, isLoading, error } = useProjects();
+  const { projects, isLoading } = useProjects();
   const [selectedProject, setSelectedProject] = useState<{ title: string; images: string[] } | null>(null);
 
   // Fallback projects if database is empty or there's an error
@@ -71,14 +71,6 @@ const ProjectsSection = () => {
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
             <p className="text-muted-foreground">Loading projects...</p>
-          </div>
-        )}
-
-        {/* Error State */}
-        {error && (
-          <div className="text-center py-12">
-            <p className="text-destructive mb-4">Error loading projects: {error}</p>
-            <p className="text-muted-foreground">Showing sample projects instead</p>
           </div>
         )}
 

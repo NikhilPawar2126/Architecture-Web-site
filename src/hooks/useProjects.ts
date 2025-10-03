@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
 export interface Project {
   id: string;
@@ -12,27 +11,21 @@ export interface Project {
   created_at: string;
 }
 
+const STORAGE_KEY = 'portfolio_projects';
+
 export const useProjects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  const fetchProjects = async () => {
+  const fetchProjects = () => {
     try {
       setIsLoading(true);
-      setError(null);
-      
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      
-      setProjects(data || []);
+      const stored = localStorage.getItem(STORAGE_KEY);
+      const data = stored ? JSON.parse(stored) : [];
+      setProjects(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch projects');
       console.error('Error fetching projects:', err);
+      setProjects([]);
     } finally {
       setIsLoading(false);
     }
@@ -45,7 +38,6 @@ export const useProjects = () => {
   return {
     projects,
     isLoading,
-    error,
     refetch: fetchProjects
   };
 };
