@@ -1,9 +1,12 @@
-import { ExternalLink, Calendar, MapPin, Award } from "lucide-react";
+import { Calendar, MapPin, Award, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useProjects } from "@/hooks/useProjects";
+import ProjectGallery from "./ProjectGallery";
+import { useState } from "react";
 
 const ProjectsSection = () => {
   const { projects, isLoading, error } = useProjects();
+  const [selectedProject, setSelectedProject] = useState<{ title: string; images: string[] } | null>(null);
 
   // Fallback projects if database is empty or there's an error
   const fallbackProjects = [
@@ -14,8 +17,10 @@ const ProjectsSection = () => {
       location: "Vadodara",
       year: "2024",
       description: "A contemporary 3-bedroom villa featuring clean lines, natural materials, and seamless indoor-outdoor living spaces.",
-      image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      houzz_link: "https://www.houzz.in/pro/interior-23design/interior-23design",
+      images: [
+        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      ],
       created_at: "2024-01-01"
     },
     {
@@ -25,8 +30,10 @@ const ProjectsSection = () => {
       location: "Surat",
       year: "2024",
       description: "Elegant 2-bedroom apartment with modern minimalist design, premium finishes, and smart storage solutions.",
-      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      houzz_link: "https://www.houzz.in/pro/interior-23design/interior-23design",
+      images: [
+        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      ],
       created_at: "2024-01-01"
     },
     {
@@ -36,8 +43,10 @@ const ProjectsSection = () => {
       location: "Ahmedabad", 
       year: "2023",
       description: "Modern office design with open workspace, collaborative areas, and sustainable design elements for productivity.",
-      image: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      houzz_link: "https://www.houzz.in/pro/interior-23design/interior-23design",
+      images: [
+        "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      ],
       created_at: "2024-01-01"
     }
   ];
@@ -76,10 +85,14 @@ const ProjectsSection = () => {
         {/* Projects Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {displayProjects.map((project) => (
-            <div key={project.id} className="card-elegant rounded-2xl overflow-hidden bg-card group">
+            <div 
+              key={project.id} 
+              className="card-elegant rounded-2xl overflow-hidden bg-card group cursor-pointer"
+              onClick={() => setSelectedProject({ title: project.title, images: project.images })}
+            >
               <div className="relative">
                 <img 
-                  src={project.image} 
+                  src={project.images[0]} 
                   alt={project.title}
                   className="w-full h-64 object-cover transition-smooth group-hover:scale-105"
                 />
@@ -88,10 +101,9 @@ const ProjectsSection = () => {
                     variant="secondary" 
                     size="sm"
                     className="opacity-0 group-hover:opacity-100 transition-smooth"
-                    onClick={() => window.open(project.houzz_link, '_blank')}
                   >
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    View
+                    <ImageIcon className="mr-2 h-4 w-4" />
+                    View Photos ({project.images.length})
                   </Button>
                 </div>
                 <div className="absolute top-4 left-4">
@@ -127,36 +139,29 @@ const ProjectsSection = () => {
                   variant="outline"
                   size="sm"
                   className="w-full"
-                  onClick={() => window.open(project.houzz_link, '_blank')}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedProject({ title: project.title, images: project.images });
+                  }}
                 >
-                  <ExternalLink className="mr-2 h-3 w-3" />
-                  View Details
+                  <ImageIcon className="mr-2 h-3 w-3" />
+                  View Photos ({project.images.length})
                 </Button>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="text-center mt-16">
-          <div className="mb-8">
-            <div className="inline-flex items-center gap-2 bg-accent/10 text-accent px-4 py-2 rounded-full text-sm font-medium mb-4">
-              <Award className="h-4 w-4" />
-              View Complete Portfolio on Houzz
-            </div>
-            <p className="text-lg text-muted-foreground">
-              See all my projects, client reviews, and detailed case studies on my official Houzz profile.
-            </p>
-          </div>
-          <Button 
-            size="lg" 
-            variant="outline" 
-            className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-            onClick={() => window.open('https://www.houzz.in/pro/interior-23design/interior-23design', '_blank')}
-          >
-            <ExternalLink className="mr-2 h-5 w-5" />
-            Visit Houzz Profile
-          </Button>
-        </div>
+        {/* Project Gallery Modal */}
+        {selectedProject && (
+          <ProjectGallery
+            isOpen={!!selectedProject}
+            onClose={() => setSelectedProject(null)}
+            images={selectedProject.images}
+            title={selectedProject.title}
+          />
+        )}
+
       </div>
     </section>
   );

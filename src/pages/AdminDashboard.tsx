@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Edit2, Trash2, ExternalLink } from "lucide-react";
+import { Plus, Edit2, Trash2, X, ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -17,8 +17,7 @@ interface Project {
   location: string;
   year: string;
   description: string;
-  image: string;
-  houzz_link: string;
+  images: string[];
   created_at: string;
 }
 
@@ -35,8 +34,7 @@ const AdminDashboard = () => {
     location: '',
     year: new Date().getFullYear().toString(),
     description: '',
-    image: '',
-    houzz_link: ''
+    images: ['']
   });
 
   useEffect(() => {
@@ -67,10 +65,26 @@ const AdminDashboard = () => {
     e.preventDefault();
     
     try {
+      const filteredImages = formData.images.filter(img => img.trim() !== "");
+      
+      if (filteredImages.length === 0) {
+        toast({
+          title: "Error",
+          description: "Please add at least one image URL",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const dataToSave = {
+        ...formData,
+        images: filteredImages
+      };
+      
       if (editingProject) {
         const { error } = await supabase
           .from('projects')
-          .update(formData)
+          .update(dataToSave)
           .eq('id', editingProject.id);
 
         if (error) throw error;
@@ -82,7 +96,7 @@ const AdminDashboard = () => {
       } else {
         const { error } = await supabase
           .from('projects')
-          .insert([formData]);
+          .insert([dataToSave]);
 
         if (error) throw error;
         
@@ -112,10 +126,24 @@ const AdminDashboard = () => {
       location: project.location,
       year: project.year,
       description: project.description,
-      image: project.image,
-      houzz_link: project.houzz_link
+      images: project.images || ['']
     });
     setIsDialogOpen(true);
+  };
+
+  const addImageField = () => {
+    setFormData({ ...formData, images: [...formData.images, ""] });
+  };
+
+  const removeImageField = (index: number) => {
+    const newImages = formData.images.filter((_, i) => i !== index);
+    setFormData({ ...formData, images: newImages.length > 0 ? newImages : [""] });
+  };
+
+  const updateImageField = (index: number, value: string) => {
+    const newImages = [...formData.images];
+    newImages[index] = value;
+    setFormData({ ...formData, images: newImages });
   };
 
   const handleDelete = async (id: string) => {
@@ -151,8 +179,7 @@ const AdminDashboard = () => {
       location: '',
       year: new Date().getFullYear().toString(),
       description: '',
-      image: '',
-      houzz_link: ''
+      images: ['']
     });
     setEditingProject(null);
   };
@@ -257,25 +284,39 @@ const AdminDashboard = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="image">Image URL</Label>
-                  <Input
-                    id="image"
-                    value={formData.image}
-                    onChange={(e) => setFormData({...formData, image: e.target.value})}
-                    placeholder="https://example.com/image.jpg"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="houzz_link">Houzz Link</Label>
-                  <Input
-                    id="houzz_link"
-                    value={formData.houzz_link}
-                    onChange={(e) => setFormData({...formData, houzz_link: e.target.value})}
-                    placeholder="https://www.houzz.in/..."
-                    required
-                  />
+                  <Label>Project Images</Label>
+                  <div className="space-y-2">
+                    {formData.images.map((image, index) => (
+                      <div key={index} className="flex gap-2">
+                        <Input
+                          value={image}
+                          onChange={(e) => updateImageField(index, e.target.value)}
+                          placeholder={`Image URL ${index + 1}`}
+                          required
+                        />
+                        {formData.images.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => removeImageField(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addImageField}
+                      className="w-full"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Another Image
+                    </Button>
+                  </div>
                 </div>
 
                 <div>
@@ -307,11 +348,21 @@ const AdminDashboard = () => {
           {projects.map((project) => (
             <Card key={project.id} className="card-elegant">
               <div className="relative">
-                <img 
-                  src={project.image} 
-                  alt={project.title}
-                  className="w-full h-48 object-cover rounded-t-lg"
-                />
+                <div className="grid grid-cols-3 gap-1">
+                  {project.images.slice(0, 3).map((img, idx) => (
+                    <img 
+                      key={idx}
+                      src={img} 
+                      alt={`${project.title} ${idx + 1}`}
+                      className="w-full h-32 object-cover"
+                    />
+                  ))}
+                </div>
+                {project.images.length > 3 && (
+                  <div className="absolute bottom-2 right-2 bg-background/90 px-2 py-1 rounded text-xs">
+                    +{project.images.length - 3} more
+                  </div>
+                )}
                 <div className="absolute top-2 left-2">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     project.category === 'Residential' 
@@ -335,6 +386,11 @@ const AdminDashboard = () => {
                   {project.description}
                 </p>
                 
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+                  <ImageIcon className="h-4 w-4" />
+                  {project.images.length} photo{project.images.length !== 1 ? 's' : ''}
+                </div>
+                
                 <div className="flex gap-2">
                   <Button 
                     variant="outline" 
@@ -343,15 +399,6 @@ const AdminDashboard = () => {
                   >
                     <Edit2 className="h-3 w-3 mr-1" />
                     Edit
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => window.open(project.houzz_link, '_blank')}
-                  >
-                    <ExternalLink className="h-3 w-3 mr-1" />
-                    View
                   </Button>
                   
                   <Button 

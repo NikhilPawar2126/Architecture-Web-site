@@ -8,8 +8,7 @@ export interface Project {
   location: string;
   year: string;
   description: string;
-  image: string;
-  houzz_link: string;
+  images: string[];
   created_at: string;
 }
 
