@@ -9,7 +9,7 @@ export interface Project {
   Area?: string;          // from lovable (optional)
   description: string;
   images: string[];      // from lovable
-  houzz_link?: string;   // from your code (optional in case some projects don’t have it)
+  houzz_link?: string;   // from your code (optional in case some projects don't have it)
   created_at: string;
 }
 

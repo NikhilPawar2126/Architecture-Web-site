@@ -1,9 +1,8 @@
-import { Calendar, MapPin, Award, ImageIcon, AreaChart, AreaChartIcon } from "lucide-react";
+import { Calendar, MapPin, Award, ImageIcon, AreaChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useProjects } from "@/hooks/useProjects";
 import ProjectGallery from "./ProjectGallery";
 import { useState } from "react";
-import { Area } from "recharts";
 
 const ProjectsSection = () => {
   const { projects, isLoading } = useProjects();
@@ -41,7 +40,7 @@ const ProjectsSection = () => {
       location: "Vadodara",
       year: "2023",
       Area: "200 sq ft",
-      description: "Modern small office with director’s desk, staff desks, pantry, waiting area, and geometric accents.",
+      description: "Modern small office with director's desk, staff desks, pantry, waiting area, and geometric accents.",
       images: [
         "/photos/C1.jpg",
         "/photos/C2.jpg",
@@ -49,21 +48,6 @@ const ProjectsSection = () => {
       ],
       created_at: "2024-01-01"
     }
-
-    // {
-    //   id: "fallback-3",
-    //   title: "Contemporary Office Space",
-    //   category: "Commercial" as const,
-    //   location: "Ahmedabad", 
-    //   year: "2023",
-    //   Area: "1500 sq ft",
-    //   description: "Modern office design with open workspace, collaborative areas, and sustainable design elements for productivity.",
-    //   images: [
-    //     "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    //     "https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    //   ],
-    //   created_at: "2024-01-01"
-    // }
   ];
 
   const displayProjects = projects.length > 0 ? projects : fallbackProjects;
@@ -153,23 +137,10 @@ const ProjectsSection = () => {
                     {project.description}
                   </p>
                 </div>
-                {/* <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedProject({ title: project.title, images: project.images });
-                  }}
-                >
-                  <ImageIcon className="mr-2 h-3 w-3" />
-                  View Photos ({project.images.length})
-                </Button> */}
               </div>
             </div>
           ))}
         </div>
-
 
         {/* Project Gallery Modal */}
         {selectedProject && (
