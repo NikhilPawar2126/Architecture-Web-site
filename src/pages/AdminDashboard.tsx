@@ -6,20 +6,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Edit2, Trash2, ExternalLink } from "lucide-react";
+import { Plus, Edit2, Trash2, X, ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Project {
   id: string;
   title: string;
-  category: "Residential" | "Commercial";
+  category: 'Residential' | 'Commercial';
   location: string;
   year: string;
   description: string;
-  image: string;
-  houzz_link: string;
+  images: string[];
   created_at: string;
 }
+
+const STORAGE_KEY = 'portfolio_projects';
 
 const AdminDashboard = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -29,63 +30,82 @@ const AdminDashboard = () => {
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
-    title: "",
-    category: "Residential" as "Residential" | "Commercial",
-    location: "",
+    title: '',
+    category: 'Residential' as 'Residential' | 'Commercial',
+    location: '',
     year: new Date().getFullYear().toString(),
-    description: "",
-    image: "",
-    houzz_link: "",
+    description: '',
+    images: ['']
   });
 
   useEffect(() => {
     fetchProjects();
   }, []);
 
-  // ✅ Get all projects
-  const fetchProjects = async () => {
+  const fetchProjects = () => {
     try {
-      const res = await fetch("http://localhost:5000/projects");
-      if (!res.ok) throw new Error("Failed to fetch");
-      const data = await res.json();
-      setProjects(data);
+      const stored = localStorage.getItem(STORAGE_KEY);
+      const data = stored ? JSON.parse(stored) : [];
+      setProjects(data.sort((a: Project, b: Project) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      ));
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to fetch projects",
-        variant: "destructive",
+        variant: "destructive"
       });
+      setProjects([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ✅ Add or update project
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     try {
-      const url = editingProject
-        ? `http://localhost:5000/projects/${editingProject.id}`
-        : "http://localhost:5000/projects";
+      const filteredImages = formData.images.filter(img => img.trim() !== "");
+      
+      if (filteredImages.length === 0) {
+        toast({
+          title: "Error",
+          description: "Please add at least one image URL",
+          variant: "destructive"
+        });
+        return;
+      }
 
-      const method = editingProject ? "PUT" : "POST";
-
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (!res.ok) throw new Error("Request failed");
-
-      toast({
-        title: "Success",
-        description: editingProject
-          ? "Project updated successfully"
-          : "Project added successfully",
-      });
-
+      const stored = localStorage.getItem(STORAGE_KEY);
+      const existingProjects = stored ? JSON.parse(stored) : [];
+      
+      if (editingProject) {
+        const updatedProjects = existingProjects.map((p: Project) =>
+          p.id === editingProject.id
+            ? { ...formData, images: filteredImages, id: editingProject.id, created_at: editingProject.created_at }
+            : p
+        );
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedProjects));
+        
+        toast({
+          title: "Success",
+          description: "Project updated successfully"
+        });
+      } else {
+        const newProject = {
+          ...formData,
+          images: filteredImages,
+          id: crypto.randomUUID(),
+          created_at: new Date().toISOString()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify([newProject, ...existingProjects]));
+        
+        toast({
+          title: "Success", 
+          description: "Project added successfully"
+        });
+      }
+      
       resetForm();
       setIsDialogOpen(false);
       fetchProjects();
@@ -93,12 +113,11 @@ const AdminDashboard = () => {
       toast({
         title: "Error",
         description: editingProject ? "Failed to update project" : "Failed to add project",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
 
-  // ✅ Edit project
   const handleEdit = (project: Project) => {
     setEditingProject(project);
     setFormData({
@@ -107,48 +126,58 @@ const AdminDashboard = () => {
       location: project.location,
       year: project.year,
       description: project.description,
-      image: project.image,
-      houzz_link: project.houzz_link,
+      images: project.images || ['']
     });
     setIsDialogOpen(true);
   };
 
-  // ✅ Delete project
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this project?")) return;
+  const addImageField = () => {
+    setFormData({ ...formData, images: [...formData.images, ""] });
+  };
 
+  const removeImageField = (index: number) => {
+    const newImages = formData.images.filter((_, i) => i !== index);
+    setFormData({ ...formData, images: newImages.length > 0 ? newImages : [""] });
+  };
+
+  const updateImageField = (index: number, value: string) => {
+    const newImages = [...formData.images];
+    newImages[index] = value;
+    setFormData({ ...formData, images: newImages });
+  };
+
+  const handleDelete = (id: string) => {
+    if (!confirm('Are you sure you want to delete this project?')) return;
+    
     try {
-      const res = await fetch(`http://localhost:5000/projects/${id}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) throw new Error("Delete failed");
-
+      const stored = localStorage.getItem(STORAGE_KEY);
+      const existingProjects = stored ? JSON.parse(stored) : [];
+      const updatedProjects = existingProjects.filter((p: Project) => p.id !== id);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedProjects));
+      
       toast({
         title: "Success",
-        description: "Project deleted successfully",
+        description: "Project deleted successfully"
       });
-
+      
       fetchProjects();
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to delete project",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
 
-  // ✅ Reset form after submit
   const resetForm = () => {
     setFormData({
-      title: "",
-      category: "Residential",
-      location: "",
+      title: '',
+      category: 'Residential',
+      location: '',
       year: new Date().getFullYear().toString(),
-      description: "",
-      image: "",
-      houzz_link: "",
+      description: '',
+      images: ['']
     });
     setEditingProject(null);
   };
@@ -177,9 +206,11 @@ const AdminDashboard = () => {
             <h1 className="text-4xl font-display font-bold text-primary mb-2">
               Project Dashboard
             </h1>
-            <p className="text-muted-foreground">Manage your portfolio projects</p>
+            <p className="text-muted-foreground">
+              Manage your portfolio projects
+            </p>
           </div>
-
+          
           <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
             <DialogTrigger asChild>
               <Button className="btn-accent">
@@ -190,32 +221,29 @@ const AdminDashboard = () => {
             <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle>
-                  {editingProject ? "Edit Project" : "Add New Project"}
+                  {editingProject ? 'Edit Project' : 'Add New Project'}
                 </DialogTitle>
               </DialogHeader>
-
-              {/* ✅ Form */}
+              
               <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Title + Category */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="title">Project Title</Label>
                     <Input
                       id="title"
                       value={formData.title}
-                      onChange={(e) =>
-                        setFormData({ ...formData, title: e.target.value })
-                      }
+                      onChange={(e) => setFormData({...formData, title: e.target.value})}
                       placeholder="e.g., Modern Villa Design"
                       required
                     />
                   </div>
+                  
                   <div>
                     <Label htmlFor="category">Category</Label>
-                    <Select
-                      value={formData.category}
-                      onValueChange={(value: "Residential" | "Commercial") =>
-                        setFormData({ ...formData, category: value })
+                    <Select 
+                      value={formData.category} 
+                      onValueChange={(value: 'Residential' | 'Commercial') => 
+                        setFormData({...formData, category: value})
                       }
                     >
                       <SelectTrigger>
@@ -229,71 +257,72 @@ const AdminDashboard = () => {
                   </div>
                 </div>
 
-                {/* Location + Year */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="location">Location</Label>
                     <Input
                       id="location"
                       value={formData.location}
-                      onChange={(e) =>
-                        setFormData({ ...formData, location: e.target.value })
-                      }
+                      onChange={(e) => setFormData({...formData, location: e.target.value})}
                       placeholder="e.g., Vadodara"
                       required
                     />
                   </div>
+                  
                   <div>
                     <Label htmlFor="year">Year</Label>
                     <Input
                       id="year"
                       value={formData.year}
-                      onChange={(e) =>
-                        setFormData({ ...formData, year: e.target.value })
-                      }
+                      onChange={(e) => setFormData({...formData, year: e.target.value})}
                       placeholder="e.g., 2024"
                       required
                     />
                   </div>
                 </div>
 
-                {/* Image URL */}
                 <div>
-                  <Label htmlFor="image">Image URL</Label>
-                  <Input
-                    id="image"
-                    value={formData.image}
-                    onChange={(e) =>
-                      setFormData({ ...formData, image: e.target.value })
-                    }
-                    placeholder="https://example.com/image.jpg"
-                    required
-                  />
+                  <Label>Project Images</Label>
+                  <div className="space-y-2">
+                    {formData.images.map((image, index) => (
+                      <div key={index} className="flex gap-2">
+                        <Input
+                          value={image}
+                          onChange={(e) => updateImageField(index, e.target.value)}
+                          placeholder={`Image URL ${index + 1}`}
+                          required
+                        />
+                        {formData.images.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => removeImageField(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addImageField}
+                      className="w-full"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Another Image
+                    </Button>
+                  </div>
                 </div>
 
-                {/* Houzz Link */}
-                <div>
-                  <Label htmlFor="houzz_link">Houzz Link</Label>
-                  <Input
-                    id="houzz_link"
-                    value={formData.houzz_link}
-                    onChange={(e) =>
-                      setFormData({ ...formData, houzz_link: e.target.value })
-                    }
-                    placeholder="https://www.houzz.in/..."
-                    required
-                  />
-                </div>
-
-                {/* Description */}
                 <div>
                   <Label htmlFor="description">Description</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
                     placeholder="Brief description of the project..."
                     rows={3}
                     required
@@ -302,13 +331,9 @@ const AdminDashboard = () => {
 
                 <div className="flex gap-2 pt-4">
                   <Button type="submit" className="btn-primary">
-                    {editingProject ? "Update Project" : "Add Project"}
+                    {editingProject ? 'Update Project' : 'Add Project'}
                   </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleDialogClose}
-                  >
+                  <Button type="button" variant="outline" onClick={handleDialogClose}>
                     Cancel
                   </Button>
                 </div>
@@ -317,62 +342,65 @@ const AdminDashboard = () => {
           </Dialog>
         </div>
 
-        {/* ✅ Project List */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project) => (
             <Card key={project.id} className="card-elegant">
               <div className="relative">
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="w-full h-48 object-cover rounded-t-lg"
-                />
+                <div className="grid grid-cols-3 gap-1">
+                  {project.images.slice(0, 3).map((img, idx) => (
+                    <img 
+                      key={idx}
+                      src={img} 
+                      alt={`${project.title} ${idx + 1}`}
+                      className="w-full h-32 object-cover"
+                    />
+                  ))}
+                </div>
+                {project.images.length > 3 && (
+                  <div className="absolute bottom-2 right-2 bg-background/90 px-2 py-1 rounded text-xs">
+                    +{project.images.length - 3} more
+                  </div>
+                )}
                 <div className="absolute top-2 left-2">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      project.category === "Residential"
-                        ? "bg-accent text-accent-foreground"
-                        : "bg-secondary text-secondary-foreground"
-                    }`}
-                  >
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    project.category === 'Residential' 
+                      ? 'bg-accent text-accent-foreground' 
+                      : 'bg-secondary text-secondary-foreground'
+                  }`}>
                     {project.category}
                   </span>
                 </div>
               </div>
-
+              
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">{project.title}</CardTitle>
                 <p className="text-sm text-muted-foreground">
                   {project.location} • {project.year}
                 </p>
               </CardHeader>
-
+              
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                   {project.description}
                 </p>
-
+                
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+                  <ImageIcon className="h-4 w-4" />
+                  {project.images.length} photo{project.images.length !== 1 ? 's' : ''}
+                </div>
+                
                 <div className="flex gap-2">
-                  <Button
-                    variant="outline"
+                  <Button 
+                    variant="outline" 
                     size="sm"
                     onClick={() => handleEdit(project)}
                   >
                     <Edit2 className="h-3 w-3 mr-1" />
                     Edit
                   </Button>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.open(project.houzz_link, "_blank")}
-                  >
-                    <ExternalLink className="h-3 w-3 mr-1" />
-                    View
-                  </Button>
-
-                  <Button
-                    variant="destructive"
+                  
+                  <Button 
+                    variant="destructive" 
                     size="sm"
                     onClick={() => handleDelete(project.id)}
                   >

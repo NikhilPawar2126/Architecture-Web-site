@@ -1,49 +1,72 @@
-import { ExternalLink, Calendar, MapPin, Award } from "lucide-react";
+import { Calendar, MapPin, Award, ImageIcon, AreaChart, AreaChartIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useProjects } from "@/hooks/useProjects";
+import ProjectGallery from "./ProjectGallery";
+import { useState } from "react";
+import { Area } from "recharts";
 
 const ProjectsSection = () => {
-  const projects = [
+  const { projects, isLoading } = useProjects();
+  const [selectedProject, setSelectedProject] = useState<{ title: string; images: string[] } | null>(null);
+
+  // Fallback projects if database is empty or there's an error
+  const fallbackProjects = [
     {
-      id: 1,
-      title: "Modern Villa Design", 
-      category: "Residential",
+      id: "fallback-1",
+      title: "Modern Home Design",
+      category: "Residential" as const,
+      location: "Ganthinagar",
+      year: "2022",
+      Area: "810 sq ft",
+      description: "The design offers a modern, spacious layout with vibrant accents, creating a stylish, functional, and energetic home for the young couple.",
+      images: [
+        "/photos/R1.jpg",
+        "/photos/R2.jpg",
+        "/photos/R2,2.jpg",
+        "/photos/R3.jpg",
+        "/photos/R4.jpg",
+        "/photos/R5.jpg",
+        "/photos/R6.jpg",
+        "/photos/R7.jpg",
+        "/photos/R8.jpg",
+        "/photos/R9.jpg",
+      ],
+      created_at: "2024-01-01"
+    },
+
+    {
+      id: "fallback-2",
+      title: "Office Interior",
+      category: "Commercial" as const,
       location: "Vadodara",
-      year: "2024",
-      description: "A contemporary 3-bedroom villa featuring clean lines, natural materials, and seamless indoor-outdoor living spaces.",
-      image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      houzzLink: "https://www.houzz.in/pro/interior-23design/interior-23design"
-    },
-    {
-      id: 2,
-      title: "Luxury Apartment Interior",
-      category: "Residential", 
-      location: "Surat",
-      year: "2024",
-      description: "Elegant 2-bedroom apartment with modern minimalist design, premium finishes, and smart storage solutions.",
-      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      houzzLink: "https://www.houzz.in/pro/interior-23design/interior-23design"
-    },
-    {
-      id: 3,
-      title: "Contemporary Office Space",
-      category: "Commercial",
-      location: "Ahmedabad", 
       year: "2023",
-      description: "Modern office design with open workspace, collaborative areas, and sustainable design elements for productivity.",
-      image: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      houzzLink: "https://www.houzz.in/pro/interior-23design/interior-23design"
-    },
-    {
-      id: 3,
-      title: "Contemporary Office Space",
-      category: "Commercial",
-      location: "Ahmedabad", 
-      year: "2023",
-      description: "Modern office design with open workspace, collaborative areas, and sustainable design elements for productivity.",
-      image: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      houzzLink: "https://www.houzz.in/pro/interior-23design/interior-23design"
+      Area: "200 sq ft",
+      description: "Modern small office with director’s desk, staff desks, pantry, waiting area, and geometric accents.",
+      images: [
+        "/photos/C1.jpg",
+        "/photos/C2.jpg",
+        "/photos/C3.jpg",
+      ],
+      created_at: "2024-01-01"
     }
+
+    // {
+    //   id: "fallback-3",
+    //   title: "Contemporary Office Space",
+    //   category: "Commercial" as const,
+    //   location: "Ahmedabad", 
+    //   year: "2023",
+    //   Area: "1500 sq ft",
+    //   description: "Modern office design with open workspace, collaborative areas, and sustainable design elements for productivity.",
+    //   images: [
+    //     "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    //     "https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    //   ],
+    //   created_at: "2024-01-01"
+    // }
   ];
+
+  const displayProjects = projects.length > 0 ? projects : fallbackProjects;
 
   return (
     <section id="projects" className="py-20 bg-muted/30">
@@ -53,38 +76,56 @@ const ProjectsSection = () => {
             My Projects
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Explore my portfolio showcasing residential and commercial design expertise 
+            Explore my portfolio showcasing residential and commercial design expertise
             with unique vision and meticulous attention to detail.
           </p>
         </div>
 
+        {/* Loading State */}
+        {isLoading && (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading projects...</p>
+          </div>
+        )}
+
         {/* Projects Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {projects.map((project) => (
-            <div key={project.id} className="card-elegant rounded-2xl overflow-hidden bg-card group">
+        <div
+          className="grid gap-8 justify-center 
+             max-w-7xl mx-auto 
+             grid-cols-[repeat(auto-fit,minmax(300px,1fr))]"
+        >
+          {displayProjects.map((project) => (
+            <div
+              key={project.id}
+              className="card-elegant rounded-2xl overflow-hidden bg-card group cursor-pointer"
+              onClick={() =>
+                setSelectedProject({ title: project.title, images: project.images })
+              }
+            >
               <div className="relative">
-                <img 
-                  src={project.image} 
+                <img
+                  src={project.images[0]}
                   alt={project.title}
                   className="w-full h-64 object-cover transition-smooth group-hover:scale-105"
                 />
                 <div className="project-overlay">
-                  <Button 
-                    variant="secondary" 
+                  <Button
+                    variant="secondary"
                     size="sm"
                     className="opacity-0 group-hover:opacity-100 transition-smooth"
-                    onClick={() => window.open(project.houzzLink, '_blank')}
                   >
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    View
+                    <ImageIcon className="mr-2 h-4 w-4" />
+                    View Photos 
                   </Button>
                 </div>
                 <div className="absolute top-4 left-4">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    project.category === 'Residential' || project.category === 'Commercial' || project.category === 'Renovation'|| project.category === 'Other'
-                      ? 'bg-accent text-accent-foreground' 
-                      : 'bg-secondary text-secondary-foreground'
-                  }`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${project.category === "commercial" || project.category === "Commercial"  || project.category === "residential" || project.category === "Residential"  
+                        ? "bg-accent text-accent-foreground"
+                        : "bg-secondary text-secondary-foreground"
+                      }`}
+                  >
                     {project.category}
                   </span>
                 </div>
@@ -100,6 +141,10 @@ const ProjectsSection = () => {
                       <MapPin className="h-3 w-3 mr-1" />
                       {project.location}
                     </div>
+                    <div className="flex items-center">
+                      <AreaChart className="h-3 w-3 mr-1" />
+                      {project.Area ? project.Area : "N/A"}
+                    </div>
                   </div>
                   <h3 className="text-xl font-display font-bold text-primary mb-2">
                     {project.title}
@@ -108,43 +153,37 @@ const ProjectsSection = () => {
                     {project.description}
                   </p>
                 </div>
-                <Button 
+                {/* <Button
                   variant="outline"
                   size="sm"
                   className="w-full"
-                  onClick={() => window.open(project.houzzLink, '_blank')}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedProject({ title: project.title, images: project.images });
+                  }}
                 >
-                  <ExternalLink className="mr-2 h-3 w-3" />
-                  View Details
-                </Button>
+                  <ImageIcon className="mr-2 h-3 w-3" />
+                  View Photos ({project.images.length})
+                </Button> */}
               </div>
             </div>
           ))}
         </div>
 
-        <div className="text-center mt-16">
-          <div className="mb-8">
-            <div className="inline-flex items-center gap-2 bg-accent/10 text-accent px-4 py-2 rounded-full text-sm font-medium mb-4">
-              <Award className="h-4 w-4" />
-              View Complete Portfolio on Houzz
-            </div>
-            <p className="text-lg text-muted-foreground">
-              See all my projects, client reviews, and detailed case studies on my official Houzz profile.
-            </p>
-          </div>
-          <Button 
-            size="lg" 
-            variant="outline" 
-            className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-            onClick={() => window.open('https://www.houzz.in/pro/interior-23design/interior-23design', '_blank')}
-          >
-            <ExternalLink className="mr-2 h-5 w-5" />
-            Visit Houzz Profile
-          </Button>
-        </div>
+
+        {/* Project Gallery Modal */}
+        {selectedProject && (
+          <ProjectGallery
+            isOpen={!!selectedProject}
+            onClose={() => setSelectedProject(null)}
+            images={selectedProject.images}
+            title={selectedProject.title}
+          />
+        )}
+
       </div>
     </section>
   );
 };
 
-export default ProjectsSection;  
+export default ProjectsSection;

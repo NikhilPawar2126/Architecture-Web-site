@@ -1,42 +1,48 @@
 import express from "express";
 import cors from "cors";
-import { v4 as uuidv4 } from "uuid";
+import { Resend } from "resend";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
 
-// Fake DB (later replace with MongoDB / MySQL / PostgreSQL)
-let projects: any[] = [];
+// Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Get all projects
-app.get("/projects", (req, res) => {
-  res.json(projects);
-});
+// Test route
+app.post("/api/contact", async (req, res) => {
+  const { name, email, message } = req.body;
 
-// Add project
-app.post("/projects", (req, res) => {
-  const newProject = { id: uuidv4(), created_at: new Date().toISOString(), ...req.body };
-  projects.unshift(newProject);
-  res.status(201).json(newProject);
-});
+  if (!name || !email || !message) {
+    return res.status(400).json({ success: false, message: "All fields are required" });
+  }
 
-// Update project
-app.put("/projects/:id", (req, res) => {
-  const { id } = req.params;
-  projects = projects.map(p => (p.id === id ? { ...p, ...req.body } : p));
-  res.json({ message: "Updated" });
-});
+  try {
+    const response = await resend.emails.send({
+      from: "onboarding@resend.dev", // ✅ use "onboarding@resend.dev" first
+      to: "interior23design@gmail.com", // replace with your email
+      subject: `New Contact from ${name}`,
+      html: `
+        <h3>You got a new message</h3>
+        <p><b>Name:</b> ${name}</p>
+        <p><b>Email:</b> ${email}</p>
+        <p><b>Message:</b> ${message}</p>
+      `,
+    });
 
-// Delete project
-app.delete("/projects/:id", (req, res) => {
-  const { id } = req.params;
-  projects = projects.filter(p => p.id !== id);
-  res.json({ message: "Deleted" });
+    console.log("📩 Email sent:", response);
+    res.json({ success: true, message: "Email sent successfully!" });
+  } catch (error) {
+    console.error("❌ Resend error:", error);
+    res.status(500).json({ success: false, message: "Failed to send email" });
+  }
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Backend running at http://localhost:${PORT}`);
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });
