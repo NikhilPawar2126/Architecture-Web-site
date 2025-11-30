@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/54878554-a4a4-4354-a27a-2ee5731f5ba3
+**URL**: https://architecture-web-site-r5lr-2jhyxr65g-nikhils-projects-347548e5.vercel.app/
 
 ## How can I edit this code?
 
@@ -10,7 +10,7 @@ There are several ways of editing your application.
 
 **Use Lovable**
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/54878554-a4a4-4354-a27a-2ee5731f5ba3) and start prompting.
+Simply visit the(https://architecture-web-site-r5lr-2jhyxr65g-nikhils-projects-347548e5.vercel.app/) and start prompting.
 
 Changes made via Lovable will be committed automatically to this repo.
 
